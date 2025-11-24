@@ -1,5 +1,11 @@
-#ifndef SCENE_H
+#ifndef SCENE_H // (se tiver guardas de inclusão)
 #define SCENE_H
+
+#include <GL/glut.h>
+
+extern GLuint texturaCorinthians; 
+
+GLuint carregarBMP(const char *imagepath);
 
 extern float anguloPiramide;
 extern float anguloEsfera;

@@ -74,7 +74,7 @@ void timer(int v)
     if (anguloPiramide >= 360.0f)
         anguloPiramide -= 360.0f;
 
-    anguloEsfera += 10.0f;
+    anguloEsfera += 1.0f;
     if (anguloEsfera >= 360.0f)
         anguloEsfera -= 360.0f;
 

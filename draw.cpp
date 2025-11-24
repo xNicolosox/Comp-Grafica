@@ -10,8 +10,8 @@ static void desenhaLosango(float altura)
     float h = altura / 2.0f;
     float s = altura / 3.0f;
 
-    float claro[3] = {0.3f, 1.0f, 0.3f};
-    float escuro[3] = {0.0f, 0.6f, 0.0f};
+    float claro[3] = {0.40f, 0.00f, 0.00f};
+    float escuro[3] = {0.80f, 0.00f, 0.00f};
 
     glBegin(GL_TRIANGLES);
     // metade de cima
@@ -69,7 +69,7 @@ void desenhaChao()
     glEnd();
 }
 
-// --- 1. Adicione esta função nova para substituir o glutSolidCylinder ---
+// Adicione esta função nova para substituir o glutSolidCylinder ---
 static void desenhaCilindro(float raio, float altura, int slices)
 {
     GLUquadric *quad = gluNewQuadric();
@@ -79,7 +79,6 @@ static void desenhaCilindro(float raio, float altura, int slices)
     gluDeleteQuadric(quad);
 }
 
-// --- 2. Atualize a função desenhaTubo para usar a desenhaCilindro ---
 static void desenhaTubo(float x1, float y1, float x2, float y2, float espessura)
 {
     float dx = x2 - x1;
@@ -93,13 +92,11 @@ static void desenhaTubo(float x1, float y1, float x2, float y2, float espessura)
     glRotatef(angulo, 0.0f, 0.0f, 1.0f); // Gira no plano XY
     glRotatef(90.0f, 0.0f, 1.0f, 0.0f);  // Gira para o eixo X
     
-    // AQUI MUDOU: Usamos nossa função customizada
     desenhaCilindro(espessura, comprimento, 10);
     
     glPopMatrix();
 }
 
-// --- 3. Substitua a função da bicicleta inteira (ajustei a parte do guidão tbm) ---
 static void desenhaBicicleta()
 {
     float angulo = -glutGet(GLUT_ELAPSED_TIME) * 0.5f; 
@@ -164,7 +161,6 @@ static void desenhaBicicleta()
     // Barra horizontal do guidão
     glPushMatrix();
         glTranslatef(0.45f, 0.9f, -0.3f); 
-        // AQUI MUDOU: Substituímos glutSolidCylinder por desenhaCilindro
         desenhaCilindro(grossuraGuidao, 0.6f, 10); 
     glPopMatrix();
 
@@ -224,37 +220,34 @@ void desenhaTorresELosangos()
         float z = RAIO * sinf(ang);
 
         glPushMatrix();
-        glTranslatef(x, 0.0f, z); // Move para a posição da torre
+        glTranslatef(x, 0.0f, z);
 
-        // ============================================
-        // CÓDIGO DA BICICLETA AQUI
-        // ============================================
-        if (i == 3) // Apenas na primeira torre
+        if (i == 3) 
         {
             glPushMatrix();
             // Ajusta posição para encostar na base da torre
             glTranslatef(0.10f, 0.0f, 0.9f); 
             
-            // Gira a bike para ficar numa posição legal
+            // Gira a bike
             glRotatef(23.0f, 0.0f, 4.0f, 0.0f); 
             
-            // Inclina ela um pouco (como se estivesse apoiada)
+            // Inclina ela como se estivesse apoiada)
             glRotatef(-15.0f, 8.0f, 0.0f, 0.0f);
 
             desenhaBicicleta();
             glPopMatrix();
         }
-        // ============================================
+        
 
         // Torre roxa
         glPushMatrix();
-        glColor3f(0.6f, 0.0f, 0.8f);
+        glColor3f(1.0f, 1.0f, 1.0f);
         glTranslatef(0.0f, alturaTorre / 2.0f, 0.0f);
         glScalef(w, alturaTorre, w);
         glutSolidCube(1.0f);
         glPopMatrix();
 
-        // Losango verde girando em cima 
+        // Losango branco girando em cima 
         glPushMatrix();
         glTranslatef(0.0f, alturaTorre + 1.2f, 0.0f);
         glRotatef(anguloPiramide, 0.0f, 1.0f, 0.0f);
@@ -273,12 +266,9 @@ void desenhaPiramideDegraus()
 
     glPushMatrix();
 
-    float roxo1[3] = {0.55f, 0.00f, 0.75f};
-    float roxo2[3] = {0.65f, 0.10f, 0.85f};
-    float roxo3[3] = {0.75f, 0.20f, 0.95f};
 
     // Degrau 1
-    glColor3f(roxo1[0], roxo1[1], roxo1[2]);
+    glColor3f(0.0f, 0.0f, 0.0f);
     glPushMatrix();
     glTranslatef(0.0f, alturaDegrau / 2.0f, 0.0f);
     glScalef(tamanhoBase, alturaDegrau, tamanhoBase);
@@ -286,7 +276,7 @@ void desenhaPiramideDegraus()
     glPopMatrix();
 
     // Degrau 2
-    glColor3f(roxo2[0], roxo2[1], roxo2[2]);
+    glColor3f(1.0f, 1.0f, 1.0f);
     glPushMatrix();
     glTranslatef(0.0f, alturaDegrau + alturaDegrau / 2.0f, 0.0f);
     glScalef(tamanhoBase * reducao, alturaDegrau, tamanhoBase * reducao);
@@ -294,7 +284,7 @@ void desenhaPiramideDegraus()
     glPopMatrix();
 
     // Degrau 3
-    glColor3f(roxo3[0], roxo3[1], roxo3[2]);
+    glColor3f(0.0f, 0.0f, 0.0f);
     glPushMatrix();
     glTranslatef(0.0f, 2 * alturaDegrau + alturaDegrau / 2.0f, 0.0f);
     glScalef(tamanhoBase * reducao * reducao,
@@ -309,13 +299,18 @@ void desenhaPiramideDegraus()
 
     glPushMatrix();
     glTranslatef(0.0f, topoDegrausY + raioEsfera + 0.2f, 0.0f);
+    
+    // coordenadas da esfera (para o escudo)
+    float xEsfera = 0.0f;
+    float yEsfera = topoDegrausY + raioEsfera + 0.2f;
+    float zEsfera = 0.0f;
 
     glRotatef(anguloEsfera, 1.0f, 1.5f, 0.0f);
 
     double eq[4];
 
     // metade de cima
-    glColor3f(0.40f, 0.00f, 0.00f);
+    glColor3f(1.0f, 1.0f, 1.0f);
     eq[0] = 0;
     eq[1] = -1;
     eq[2] = 0;
@@ -326,7 +321,7 @@ void desenhaPiramideDegraus()
     glDisable(GL_CLIP_PLANE0);
 
     // metade de baixo
-    glColor3f(0.80f, 0.00f, 0.00f);
+    glColor3f(0.00f, 0.00f, 0.00f);
     eq[0] = 0;
     eq[1] = 1;
     eq[2] = 0;
@@ -339,4 +334,36 @@ void desenhaPiramideDegraus()
     glPopMatrix();
 
     glPopMatrix();
+
+    //             ESCUDO DO CORINTHIANS
+    if (texturaCorinthians == 0) {
+        texturaCorinthians = carregarBMP("logo.bmp");
+    }
+
+    if (texturaCorinthians != 0) 
+    {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texturaCorinthians);
+        
+        glColor3f(1.0f, 1.0f, 1.0f); // Cor branca
+
+        glPushMatrix();
+        
+        glTranslatef(0.0f, yEsfera + raioEsfera + 2.5f, 0.0f);
+        
+        // Rotação
+        glRotatef(anguloEsfera, 0.0f, 1.0f, 0.0f);
+
+        // Desenha
+        float tamanhoLogo = 2.0f;
+        glBegin(GL_QUADS);
+            glTexCoord2f(0.0f, 0.0f); glVertex3f(-tamanhoLogo, -tamanhoLogo, 0.0f);
+            glTexCoord2f(1.0f, 0.0f); glVertex3f( tamanhoLogo, -tamanhoLogo, 0.0f);
+            glTexCoord2f(1.0f, 1.0f); glVertex3f( tamanhoLogo,  tamanhoLogo, 0.0f);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f(-tamanhoLogo,  tamanhoLogo, 0.0f);
+        glEnd();
+
+        glPopMatrix();
+        glDisable(GL_TEXTURE_2D);
+    }
 }
