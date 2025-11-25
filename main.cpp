@@ -1,12 +1,11 @@
-#include <GL/glut.h>
-#include <math.h>
-#include <cstdio>
 #include "scene.h"
 #include "input.h"
+#include <math.h>
+#include <cstdio>
+
 
 float anguloPiramide = 0.0f;
 float anguloEsfera = 0.0f;
-
 int fps = 0;
 int frameCount = 0;
 int previousTime = 0;
@@ -29,6 +28,7 @@ void display()
         camX + dirX, camY + dirY, camZ + dirZ,
         0.0f, 1.0f, 0.0f);
 
+    desenhaCeu();
     desenhaChao();
     desenhaTorresELosangos();
     desenhaPiramideDegraus();
@@ -52,19 +52,18 @@ void display()
 
 void reshape(int w, int h)
 {
-    if (h == 0)
-        h = 1;
+if (h == 0) h = 1;
     float a = (float)w / (float)h;
 
     glViewport(0, 0, w, h);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0f, a, 1.0f, 100.0f);
+    
+    // --- MUDANÇA AQUI: De 100.0f para 2000.0f ---
+    gluPerspective(60.0f, a, 1.0f, 2000.0f); 
 
     glMatrixMode(GL_MODELVIEW);
-
-    // informa ao módulo de input onde é o centro da janela
     atualizaCentroJanela(w, h);
 }
 
@@ -86,26 +85,40 @@ void timer(int v)
 
 int main(int argc, char **argv)
 {
+    // --- 1. Inicializa GLUT e Cria a Janela ---
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-
     glutInitWindowSize(janelaW, janelaH);
-    glutCreateWindow("Um dia vai ser DOOM");
+    glutCreateWindow("Projeto Shader - DOOM"); // Escolhi um nome legal ;)
 
+    // --- 2. Inicializa GLEW (TEM QUE SER LOGO APÓS CRIAR A JANELA) ---
+    GLenum err = glewInit();
+    if (GLEW_OK != err) {
+        printf("Erro ao iniciar GLEW: %s\n", glewGetErrorString(err));
+        return 1;
+    }
+
+    // --- 3. Carrega os Shaders ---
+    initShaders(); 
+    setupIluminacao();
+
+    // --- 4. Configuraçõesa Globais do OpenGL ---
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.05f, 0.05f, 0.1f, 1.0f);
+    glClearColor(0.05f, 0.05f, 0.1f, 1.0f); // Cor do fundo (azul escuro)
 
+    // --- 5. Define as Funções de Callback (Teclado, Mouse, Desenho) ---
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
     glutKeyboardUpFunc(keyboardUp);
     glutPassiveMotionFunc(mouseMotion);
 
-    glutSetCursor(GLUT_CURSOR_NONE); // esconde o cursor
+    // --- 6. Outras configs ---
+    glutSetCursor(GLUT_CURSOR_NONE); // Esconde o cursor
+    glutTimerFunc(0, timer, 0);      // Inicia o loop de animação
 
-    glutTimerFunc(0, timer, 0);
-
-    // glutFullScreen();
+    // --- 7. Loop Principal ---
     glutMainLoop();
+
     return 0;
 }

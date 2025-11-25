@@ -15,7 +15,8 @@
                 "${fileDirname}/${fileBasenameNoExtension}.exe",
                 "-lopengl32",
                 "-lglu32",
-                "-lfreeglut"
+                "-lfreeglut",
+                "-lglew32"
             ],
             "options": {
                 "cwd": "${fileDirname}"
