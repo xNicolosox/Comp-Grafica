@@ -2,8 +2,10 @@
 #include <math.h>
 #include <stdio.h>  
 #include <stdlib.h> 
+#include <fstream>
+#include <iostream>
 
-
+std::vector<std::string> mapa; // Aqui o mapa nasce vazio
 GLuint texturaCorinthians = 0; 
 GLuint texturaChao = 0;
 GLuint texturaBola = 0;
@@ -11,6 +13,12 @@ GLuint shaderGlow = 0;
 GLuint texturaTorre = 0;
 GLuint texturaPiramide = 0;
 GLuint texturaCeuBackground = 0;
+GLuint texParede1 = 0;
+GLuint texParede2 = 0;
+GLuint texPiso1 = 0;
+GLuint texPiso2 = 0;
+GLuint texTeto = 0;
+
 
 GLuint carregarBMP(const char *imagepath) {
     unsigned char header[54];

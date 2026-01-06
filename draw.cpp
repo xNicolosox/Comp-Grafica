@@ -242,11 +242,21 @@ void desenhaChao()
     glDisable(GL_TEXTURE_2D);
 }
 
-static void desenhaCuboTexturizado()
+// Função genérica para desenhar um cubo completo (Parede) com uma textura específica
+static void desenhaBloco(GLuint texturaID)
 {
-    // Cubo unitário (tamanho 1.0) centrado na origem
+    if (texturaID != 0) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texturaID);
+        glColor3f(1.0f, 1.0f, 1.0f);
+    } else {
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(0.6f, 0.6f, 0.6f); // Cinza se falhar
+    }
+
     float d = 0.5f;
 
+    // Desenha o cubo (lados)
     glBegin(GL_QUADS);
         // Frente
         glNormal3f(0.0f, 0.0f, 1.0f);
@@ -254,36 +264,58 @@ static void desenhaCuboTexturizado()
         glTexCoord2f(1.0f, 0.0f); glVertex3f( d, -d,  d);
         glTexCoord2f(1.0f, 1.0f); glVertex3f( d,  d,  d);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-d,  d,  d);
-
         // Trás
         glNormal3f(0.0f, 0.0f, -1.0f);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(-d, -d, -d);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(-d,  d, -d);
         glTexCoord2f(0.0f, 1.0f); glVertex3f( d,  d, -d);
         glTexCoord2f(0.0f, 0.0f); glVertex3f( d, -d, -d);
-
         // Direita
         glNormal3f(1.0f, 0.0f, 0.0f);
         glTexCoord2f(1.0f, 0.0f); glVertex3f( d, -d, -d);
         glTexCoord2f(1.0f, 1.0f); glVertex3f( d,  d, -d);
         glTexCoord2f(0.0f, 1.0f); glVertex3f( d,  d,  d);
         glTexCoord2f(0.0f, 0.0f); glVertex3f( d, -d,  d);
-
         // Esquerda
         glNormal3f(-1.0f, 0.0f, 0.0f);
         glTexCoord2f(0.0f, 0.0f); glVertex3f(-d, -d, -d);
         glTexCoord2f(1.0f, 0.0f); glVertex3f(-d, -d,  d);
         glTexCoord2f(1.0f, 1.0f); glVertex3f(-d,  d,  d);
         glTexCoord2f(0.0f, 1.0f); glVertex3f(-d,  d, -d);
-
-        // Topo (pra caso a torre for vista de cima)
-        glNormal3f(0.0f, 1.0f, 0.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-d,  d, -d);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-d,  d,  d);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( d,  d,  d);
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( d,  d, -d);
-        
+        // Topo e Base também podem ser desenhados aqui se a parede for flutuante,
+        // mas para paredes de labirinto, geralmente só os lados importam.
     glEnd();
+    glDisable(GL_TEXTURE_2D);
+}
+
+// Função genérica para desenhar Chão ou Teto (um quadrado plano)
+// isCeiling: se true, desenha em cima e aponta a normal para baixo
+static void desenhaPlanoHorizontal(GLuint texturaID, bool isCeiling)
+{
+    if (texturaID != 0) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, texturaID);
+        glColor3f(1.0f, 1.0f, 1.0f);
+    } else {
+        glDisable(GL_TEXTURE_2D);
+        glColor3f(0.4f, 0.4f, 0.4f);
+    }
+
+    float d = 0.5f;
+    float yPos = isCeiling ? d : -d; // Se for teto é +0.5, se for chão é -0.5
+    float normalY = isCeiling ? -1.0f : 1.0f; // Teto aponta pra baixo, chão pra cima
+
+    glBegin(GL_QUADS);
+    glNormal3f(0.0f, normalY, 0.0f);
+    
+    // Mapeamento UV simples
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(-d, yPos, -d);
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-d, yPos,  d);
+    glTexCoord2f(1.0f, 1.0f); glVertex3f( d, yPos,  d);
+    glTexCoord2f(0.0f, 1.0f); glVertex3f( d, yPos, -d);
+    glEnd();
+
+    glDisable(GL_TEXTURE_2D);
 }
 
 void desenhaTorresELosangos()
@@ -333,7 +365,7 @@ void desenhaTorresELosangos()
         glScalef(w, alturaTorre, w);
         
         // SUBSTITUI O GLUTSOLIDCUBE POR NOSSA FUNÇÃO
-        desenhaCuboTexturizado(); 
+        desenhaBloco(texturaTorre); 
 
         glDisable(GL_TEXTURE_2D); // Desliga textura para não afetar o losango
         glPopMatrix();
@@ -377,21 +409,21 @@ void desenhaPiramideDegraus()
     glPushMatrix();
     glTranslatef(0.0f, alturaDegrau / 2.0f, 0.0f);
     glScalef(tamanhoBase, alturaDegrau, tamanhoBase);
-    desenhaCuboTexturizado(); 
+    desenhaBloco(texturaPiramide); 
     glPopMatrix();
 
     // Degrau 2 (Meio)
     glPushMatrix();
     glTranslatef(0.0f, alturaDegrau + alturaDegrau / 2.0f, 0.0f);
     glScalef(tamanhoBase * reducao, alturaDegrau, tamanhoBase * reducao);
-    desenhaCuboTexturizado(); 
+    desenhaBloco(texturaPiramide); 
     glPopMatrix();
 
     // Degrau 3 (Topo)
     glPushMatrix();
     glTranslatef(0.0f, 2 * alturaDegrau + alturaDegrau / 2.0f, 0.0f);
     glScalef(tamanhoBase * reducao * reducao, alturaDegrau, tamanhoBase * reducao * reducao);
-    desenhaCuboTexturizado(); 
+    desenhaBloco(texturaPiramide); 
     glPopMatrix();
 
     // Desliga a textura para não afetar a bola e o escudo
@@ -455,4 +487,99 @@ void desenhaPiramideDegraus()
 
     // --- CORREÇÃO FINAL AQUI ---
     glPopMatrix(); // <--- FALTAVA ESSE CARA FECHANDO A FUNÇÃO!
+}
+
+void desenhaCenario() // Ou o nome que você usa para desenhar o grid
+
+{
+
+    // --- 1. Carregamento Preguiçoso das Texturas ---
+
+    if (texParede1 == 0) texParede1 = carregarBMP("parede.bmp");
+
+    if (texParede2 == 0) texParede2 = carregarBMP("paredeAlt.bmp");
+
+    if (texPiso1 == 0)   texPiso1   = carregarBMP("chao.bmp");
+
+    if (texPiso2 == 0)   texPiso2   = carregarBMP("chaoAlt.bmp");
+
+    if (texTeto == 0)    texTeto    = carregarBMP("teto.bmp");
+
+    // --- CONFIGURAÇÕES DO MAPA ---
+    float tamanhoBloco = 1.0f;
+    float alturaParede = 4.0f; // <--- MUDE AQUI PARA AUMENTAR A PAREDE!
+    
+    // Move o mapa inteiro para longe da pirâmide
+    glPushMatrix();
+    glTranslatef(15.0f, 0.0f, 0.0f); 
+
+    for (int z = 0; z < mapa.size(); z++) 
+    {
+        for (int x = 0; x < mapa[z].size(); x++) 
+        {
+            char tile = mapa[z][x];
+            
+            if (tile == ' ') continue; // Pula espaços vazios
+
+            float posX = x * tamanhoBloco;
+            float posZ = z * tamanhoBloco;
+
+            glPushMatrix();
+
+            // --- SE FOR PAREDE (# ou W) ---
+            if (tile == '#' || tile == 'W') 
+            {
+                // 1. Posiciona no centro da altura (pra base ficar no chão 0.0)
+                glTranslatef(posX, alturaParede / 2.0f, posZ);
+                
+                // 2. AQUI ESTÁ A MÁGICA: Estica o bloco no eixo Y
+                glScalef(1.0f, alturaParede, 1.0f); 
+
+                // 3. Desenha
+                if (tile == '#') desenhaBloco(texParede1);
+                else desenhaBloco(texParede2);
+            }
+            // --- SE FOR PISO OU TETO (., , - +) ---
+            else 
+            {
+                // Mantém o chão na altura padrão (0.5 para ficar nível 0)
+                glTranslatef(posX, 0.51f, posZ);
+
+                switch (tile) 
+                {
+                    case '.': // Grama
+                        desenhaPlanoHorizontal(texPiso1, false); 
+                        break;
+
+                    case ',': // Terra
+                        desenhaPlanoHorizontal(texPiso2, false); 
+                        break;
+
+                    case '-': // Grama + Teto Alto
+                        desenhaPlanoHorizontal(texPiso1, false); // Chão
+                        
+                        // Sobe para desenhar o teto lá no topo da parede
+                        glPushMatrix();
+                        glTranslatef(0.0f, alturaParede - 1.0f, 0.0f);
+                        desenhaPlanoHorizontal(texTeto, true);   // Teto
+                        glPopMatrix();
+                        break;
+
+                    case '+': // Terra + Teto Alto
+                        desenhaPlanoHorizontal(texPiso2, false); // Chão
+                        
+                        // Sobe para desenhar o teto lá no topo
+                        glPushMatrix();
+                        glTranslatef(0.0f, alturaParede - 1.0f, 0.0f);
+                        desenhaPlanoHorizontal(texTeto, true);   // Teto
+                        glPopMatrix();
+                        break;
+                }
+            }
+
+            glPopMatrix();
+        }
+    }
+
+    glPopMatrix(); // Fecha o bloco do mapa inteiro
 }

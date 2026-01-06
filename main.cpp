@@ -2,13 +2,45 @@
 #include "input.h"
 #include <math.h>
 #include <cstdio>
-
+// --- NOVOS INCLUDES NECESSÁRIOS PARA LER O ARQUIVO ---
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+// -----------------------------------------------------
 
 float anguloPiramide = 0.0f;
 float anguloEsfera = 0.0f;
 int fps = 0;
 int frameCount = 0;
 int previousTime = 0;
+
+// ==========================================================
+// IMPLEMENTAÇÃO DA FUNÇÃO DE CARREGAR MAPA
+// (Tem que vir ANTES da main)
+// ==========================================================
+void carregarMapaDoArquivo(const char* caminho) {
+    std::ifstream arquivo(caminho); // Tenta abrir o arquivo
+
+    if (!arquivo.is_open()) {
+        printf("ERRO CRITICO: Nao foi possivel abrir o arquivo '%s'.\n", caminho);
+        printf("Verifique se o arquivo mapa.txt esta na mesma pasta do executavel.\n");
+        return;
+    }
+
+    mapa.clear(); // Limpa qualquer lixo anterior
+    std::string linha;
+    
+    // Lê linha por linha e guarda no vetor
+    while (std::getline(arquivo, linha)) {
+        mapa.push_back(linha);
+    }
+    
+    arquivo.close();
+    printf("Mapa carregado com sucesso! Total de linhas: %d\n", (int)mapa.size());
+}
+// ==========================================================
+
 
 void display()
 {
@@ -29,7 +61,10 @@ void display()
         0.0f, 1.0f, 0.0f);
 
     desenhaCeu();
-    desenhaChao();
+    desenhaChao(); // O chao infinito
+    
+    desenhaCenario(); // <--- AQUI ELE DESENHA O MAPA TXT
+    
     desenhaTorresELosangos();
     desenhaPiramideDegraus();
 
@@ -50,9 +85,10 @@ void display()
     }
 }
 
+
 void reshape(int w, int h)
 {
-if (h == 0) h = 1;
+    if (h == 0) h = 1;
     float a = (float)w / (float)h;
 
     glViewport(0, 0, w, h);
@@ -60,7 +96,7 @@ if (h == 0) h = 1;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     
-    // --- MUDANÇA AQUI: De 100.0f para 2000.0f ---
+    // Visão aumentada para ver o céu e o mapa grande
     gluPerspective(60.0f, a, 1.0f, 2000.0f); 
 
     glMatrixMode(GL_MODELVIEW);
@@ -89,24 +125,24 @@ int main(int argc, char **argv)
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(janelaW, janelaH);
-    glutCreateWindow("Projeto Shader - DOOM"); // Escolhi um nome legal ;)
+    glutCreateWindow("Projeto Shader - DOOM"); 
 
-    // --- 2. Inicializa GLEW (TEM QUE SER LOGO APÓS CRIAR A JANELA) ---
+    // --- 2. Inicializa GLEW ---
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         printf("Erro ao iniciar GLEW: %s\n", glewGetErrorString(err));
         return 1;
     }
 
-    // --- 3. Carrega os Shaders ---
+    // --- 3. Carrega os Shaders e Luz ---
     initShaders(); 
     setupIluminacao();
 
-    // --- 4. Configuraçõesa Globais do OpenGL ---
+    // --- 4. Configurações Globais ---
     glEnable(GL_DEPTH_TEST);
-    glClearColor(0.05f, 0.05f, 0.1f, 1.0f); // Cor do fundo (azul escuro)
+    glClearColor(0.05f, 0.05f, 0.1f, 1.0f); 
 
-    // --- 5. Define as Funções de Callback (Teclado, Mouse, Desenho) ---
+    // --- 5. Callbacks ---
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
@@ -114,10 +150,13 @@ int main(int argc, char **argv)
     glutPassiveMotionFunc(mouseMotion);
 
     // --- 6. Outras configs ---
-    glutSetCursor(GLUT_CURSOR_NONE); // Esconde o cursor
-    glutTimerFunc(0, timer, 0);      // Inicia o loop de animação
+    glutSetCursor(GLUT_CURSOR_NONE); 
+    glutTimerFunc(0, timer, 0);      
 
-    // --- 7. Loop Principal ---
+    // --- 7. CARREGA O MAPA ANTES DE ENTRAR NO LOOP ---
+    carregarMapaDoArquivo("mapa.txt");
+
+    // --- 8. Loop Principal ---
     glutMainLoop();
 
     return 0;
