@@ -1,144 +1,121 @@
-# Odeio o Xulio!!!
-#  Ambiente C/C++ + OpenGL (FreeGLUT + GLEW) no VSCode usando MSYS2
+# ODEIOS
+- ODEIO DÁRIO
+- ODEIO HELOYSA
+- ODEIO AUZIER
+- ODEIO KELVIN
 
-Este guia explica como configurar um ambiente completo para desenvolvimento em C/C++ com OpenGL, utilizando **MSYS2**, **FreeGLUT**, **GLEW** e **Visual Studio Code** no Windows.
+# DoomLike OpenGL Project
+
+Este projeto utiliza **OpenGL (pipeline fixo + GLSL 1.20)** para renderização,  
+**GLUT** para gerenciamento de janela/entrada e **GLEW** para carregar funções modernas  
+como shaders, VBOs e extensões necessárias.
+
+## 🎥 Demonstração
+https://github.com/user-attachments/assets/14542577-3ce4-4737-b87b-8184c906b062
 
 ---
 
-## 📦 1. Instalação do MSYS2
+## 📦 Dependências
 
-### 🔹 Baixar e instalar
-1. Acesse [https://www.msys2.org](https://www.msys2.org).
-2. Baixe a versão para **Windows 64 bits** e conclua a instalação padrão.
+Certifique-se de ter instalados os seguintes pacotes no seu sistema Linux:
 
-### 🔹 Atualizar o sistema
-1. Abra o terminal **MSYS2 MSYS** (ícone roxo).
-2. Execute o comando abaixo e aceite as atualizações:
+### 🛠️ Compilação
+- `g++`
+- `make`
 
+### 🖥️ Bibliotecas OpenGL
+- `freeglut`
+- `glew` (NOVA BIBLIOTECA QUE PRECISA INSTALAR)
+- `mesa`
+- `glu`
+
+### 🖼️ Carregamento de Texturas  
+- `stb_image.h` (arquivo de cabeçalho incluso no projeto)
+
+---
+
+## 🚀 Compilar e Executar
+
+Use o comando abaixo para compilar o projeto e executá-lo imediatamente:
+
+### 🐧 Linux
 ```bash
-pacman -Syu
+g++ main.cpp draw.cpp input.cpp scene.cpp texture.cpp shader.cpp \
+    -o DoomLike \
+    -lGLEW -lGL -lGLU -lglut && ./DoomLike
 ```
 
----
-
-## 🔧 2. Instalar GCC, GDB, FreeGLUT e GLEW
-
-Feche o terminal anterior e abra o terminal **MSYS2 MinGW 64-bit** (ícone azul). Execute os comandos abaixo para instalar o compilador e as bibliotecas gráficas:
-
+### 🪟 Windows
 ```bash
-# Compilador C/C++
-pacman -S mingw-w64-x86_64-gcc
-
-# Debugger
-pacman -S mingw-w64-x86_64-gdb
-
-# FreeGLUT (Janelas e Input)
-pacman -S mingw-w64-x86_64-freeglut
-
-# GLEW (Extensões modernas do OpenGL)
-pacman -S mingw-w64-x86_64-glew
+g++ main.cpp draw.cpp input.cpp scene.cpp texture.cpp shader.cpp ^
+    -o DoomLike.exe ^
+    -lglew32 -lfreeglut -lopengl32 -lglu32 && DoomLike.exe
 ```
+## 🎮 Como Jogar
+
+A cena pode ser explorada em primeira pessoa, com movimentação típica de FPS clássico.
 
 ---
 
-## 🛠️ 3. Configurar variáveis de ambiente
+## ⌨️ Controles
 
-Para que o Windows reconheça os comandos `gcc` e `g++`, adicione o binário ao Path:
-
-1. Abra a busca do Windows e digite: **"Editar as variáveis de ambiente do sistema"**.
-2. Clique em **Variáveis de Ambiente**.
-3. Na seção **Variáveis de usuário** (parte de cima), selecione a linha `Path` e clique em **Editar**.
-4. Clique em **Novo** e adicione o caminho:
-   ```
-   C:\msys64\mingw64\bin
-   ```
-5. Clique em OK em todas as janelas.
-
-> ⚠️ **Importante:** Reinicie o computador (ou faça logoff) para aplicar as mudanças.
-
-### Testar instalação
-Abra o Prompt de Comando (CMD) ou PowerShell e digite:
-```bash
-gcc --version
-gdb --version
-```
+### 🧭 Movimento
+| Tecla | Ação |
+|-------|------|
+| **W** | Avançar |
+| **A** | Mover para a esquerda (strafe) |
+| **S** | Recuar |
+| **D** | Mover para a direita (strafe) |
 
 ---
 
-## 🎨 4. Configuração do VSCode
-
-### 🔹 Instalar extensão C/C++
-1. Abra o VSCode.
-2. Vá em **Extensões** (`Ctrl+Shift+X`).
-3. Pesquise por `C/C++` (Microsoft) e instale.
+### 🖱️ Visão
+| Ação | Resultado |
+|------|-----------|
+| **Mover o mouse** | Olhar em qualquer direção |
 
 ---
 
-## 📁 5. Criar o projeto
-
-1. Crie uma pasta para seu projeto no Windows.
-2. Abra essa pasta no VSCode (`File > Open Folder`).
-3. Crie um arquivo chamado `main.cpp` e insira seu código OpenGL.
-
----
-
-## ⚙️ 6. Configurar build no VSCode (tasks.json)
-
-Este passo é crucial para linkar as bibliotecas corretamente.
-
-1. No VSCode, pressione `Ctrl+Shift+P` e digite `Tasks: Configure Default Build Task`.
-2. Selecione **g++ (MSYS2 / MinGW64)** se aparecer, ou "Create tasks.json file from template".
-3. Substitua todo o conteúdo do arquivo `.vscode/tasks.json` pelo código abaixo:
-
-```json
-{
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "build",
-            "type": "shell",
-            "command": "g++",
-            "args": [
-                "-fdiagnostics-color=always",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "-lfreeglut",
-                "-lopengl32",
-                "-lglu32",
-                "-lglew32"
-            ],
-            "problemMatcher": ["$gcc"],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
-        }
-    ]
-}
-```
-
-> **Nota:** As flags `-lfreeglut -lopengl32 -lglu32 -lglew32` são responsáveis por incluir as bibliotecas no executável final.
+### 🪟 Janelas e Sistema
+| Tecla | Ação |
+|-------|------|
+| **Alt + Enter** | Alterna entre tela cheia e modo janela |
+| **ESC** | Encerra o programa |
 
 ---
 
-## ▶️ 7. Compilar e Executar
+## 🗺️ Criando o Mapa (Matriz em `.txt`)
 
-1. Abra o arquivo `main.cpp`.
-2. Pressione `Ctrl+Shift+B` para compilar (Build).
-3. Se não houver erros, o executável (`.exe`) será gerado na mesma pasta.
-4. Execute o programa pelo terminal integrado ou clicando duas vezes no `.exe`.
+O mapa do jogo é definido por um arquivo **texto (ASCII)**, onde **cada caractere representa um tile** do mundo.  
+Cada **linha do arquivo** corresponde a uma linha do mapa, e **todas as linhas devem ter o mesmo comprimento** (mesma quantidade de colunas).
 
 ---
 
-## 🎉 Resumo da Configuração
+### ✅ Regras importantes
+- O arquivo deve ser salvo como `.txt`
+- Cada linha representa uma “fileira” do mapa
+- Todas as linhas precisam ter o mesmo tamanho
+- Use **apenas os caracteres da legenda abaixo**
+- Deve existir **exatamente um `9`** (posição inicial do jogador)
 
-Seu ambiente está pronto com:
+---
 
-- ✔️ **MSYS2** (Gerenciador de pacotes)
-- ✔️ **GCC / G++** (Compilador)
-- ✔️ **GDB** (Debugger)
-- ✔️ **FreeGLUT** (Gerenciamento de janelas)
-- ✔️ **GLEW** (Funções OpenGL modernas)
-- ✔️ **VSCode** (IDE configurada)
+### 🧩 Legenda do mapa (originais)
+| Caractere | Significado |
+|----------|-------------|
+| `1` | Parede |
+| `0` | Chão normal (piso) |
+| `L` | Lava (tile com shader de calor) |
+| `B` | Sangue (tile com shader de distorção) |
+| `9` | Spawn do jogador *(o loader converte para `0` após ler)* |
+
+---
+
+### 📌 Exemplo simples de mapa
+```txt
+1111111111
+1000000001
+10L0000B01
+1000090001
+1000000001
+1111111111
