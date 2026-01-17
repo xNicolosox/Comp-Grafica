@@ -32,7 +32,8 @@ GLuint texGunDefault, texGunFire1, texGunFire2;
 GLuint texGunReload1, texGunReload2;
 GLuint texDamage;
 float damageAlpha = 0.0f; // Começa invisível
-float healAlpha = 0.0f;
+GLuint texHealthOverlay;
+float healthAlpha = 0.0f;
 
 GLuint progSangue;
 GLuint progLava;
@@ -341,8 +342,8 @@ void updateEntities(float dt)
             if (item.type == ITEM_HEALTH) {
                 item.respawnTimer = 60.0f;
                 playerHealth += 50;
-                healAlpha = 1.0f;
                 if(playerHealth > 100) playerHealth = 100;
+                healthAlpha = 1.0f; // Mostra o overlay de cura
                 std::printf("PEGOU CURA! Vida: %d\n", playerHealth);
             }
             else if (item.type == ITEM_AMMO) {
@@ -390,9 +391,9 @@ bool gameInit(const char *mapPath)
     texEnemy = gAssets.texEnemy;
     texEnemyRage = gAssets.texEnemyRage;
     texEnemyDamage = gAssets.texEnemyDamage;
-
+    texHealthOverlay = gAssets.texHealthOverlay;
     texHealth = gAssets.texHealth;
-    texAmmo   = gAssets.texAmmo;
+    texAmmo = gAssets.texAmmo;
 
     progSangue = gAssets.progSangue;
     progLava = gAssets.progLava;
@@ -482,6 +483,13 @@ void gameUpdate(float dt)
     if (damageAlpha > 0.0f) {
         damageAlpha -= dt * 0.5f; // Demora uns 2 segundos pra sumir totalmente
         if (damageAlpha < 0.0f) damageAlpha = 0.0f;
+    }
+
+
+
+    if (healthAlpha > 0.0f) {
+        healthAlpha -= dt * 0.9f; // Ajuste 0.9f se quiser mais rápido/devagar
+        if (healthAlpha < 0.0f) healthAlpha = 0.0f;
     }
     
     // Agora o compilador acha a função porque ela foi escrita lá em cima
@@ -668,6 +676,7 @@ void drawWeaponHUD()
     glPopMatrix();
 }
 
+// Desenha o overlay de dano na tela
 void drawDamageOverlay()
 {
     if (damageAlpha <= 0.0f) return; // Se alpha é 0, não desenha nada
@@ -710,6 +719,48 @@ void drawDamageOverlay()
     glPopMatrix();
 }
 
+
+// Desenha o overlay de cura na tela
+void drawHealthOverlay()
+{
+    if (healthAlpha <= 0.0f) return; // Se alpha é 0, não desenha
+
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0, janelaW, 0, janelaH);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // --- USA A TEXTURA E O ALPHA DE CURA ---
+    glBindTexture(GL_TEXTURE_2D, texHealthOverlay);
+    glColor4f(1.0f, 1.0f, 1.0f, healthAlpha); 
+    // ---------------------------------------
+
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0f, 1.0f); glVertex2f(0, 0);            
+        glTexCoord2f(1.0f, 1.0f); glVertex2f(janelaW, 0);     
+        glTexCoord2f(1.0f, 0.0f); glVertex2f(janelaW, janelaH); 
+        glTexCoord2f(0.0f, 0.0f); glVertex2f(0, janelaH);     
+    glEnd();
+
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f); // Reseta cor
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_DEPTH_TEST);
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
+}
+
 // --- GAME RENDER ---
 void gameRender()
 {
@@ -738,6 +789,7 @@ void gameRender()
     drawEntities(gLevel.enemies, gLevel.items, camX, camZ);
     drawWeaponHUD();
     drawDamageOverlay();
+    drawHealthOverlay();
     drawAmmoHUD();
     drawHealthHUD();
 
