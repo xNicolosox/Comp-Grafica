@@ -3,8 +3,10 @@
 #include <cmath>
 #include "graphics/drawlevel.h"
 #include "core/camera.h"
+#include "core/entities.h"
 #include "level/levelmetrics.h"
 #include <cstdio>
+
 
 extern GLuint texParede;
 extern GLuint texParedeInterna;
@@ -13,6 +15,11 @@ extern GLuint texSangue;
 extern GLuint texChao;
 extern GLuint texChaoInterno;
 extern GLuint texTeto;
+extern GLuint texEnemy;
+extern GLuint texEnemyRage;
+extern GLuint texEnemyDamage;
+extern GLuint texHealth;
+extern GLuint texAmmo;
 
 extern GLuint progLava;
 extern GLuint progSangue;
@@ -298,6 +305,12 @@ void drawLevel(const MapLoader &map)
 
             char c = data[z][x];
 
+            // Se for entidade, desenha o chão embaixo dela
+            if (c == 'E' || c == 'H' || c == 'A') {
+                 desenhaTileChao(wx, wz, texChao, false);
+                 // O inimigo/item em si será desenhado DEPOIS, em outra função
+                 // que faremos na próxima etapa (Billboarding)
+            }
             // TIRAR A RESPOSNABILIDADE DO TILE DAQUI
             if (c == '0') // chão A (outdoor)
                 desenhaTileChao(wx, wz, texChao, false);
@@ -327,4 +340,94 @@ void drawLevel(const MapLoader &map)
             }
         }
     }
+}
+
+static void drawSprite(float x, float z, float w, float h, GLuint tex, float camX, float camZ)
+{
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    // Habilita teste alpha para descartar pixels transparentes (recorte)
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.1f);
+
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glColor3f(1, 1, 1);
+
+    glPushMatrix();
+    glTranslatef(x, 0.0f, z); // Vai para a posição do objeto
+
+    // MATEMÁTICA DO BILLBOARD (Olhar para a câmera)
+    // Calcula o ângulo entre o objeto e a câmera
+    float dx = camX - x;
+    float dz = camZ - z;
+    float angle = std::atan2(dx, dz) * 180.0f / 3.14159f;
+    
+    glRotatef(angle, 0.0f, 1.0f, 0.0f); // Gira no eixo Y
+
+    // Desenha o quadrado centralizado
+    float hw = w * 0.5f;
+    
+    glBegin(GL_QUADS);
+    // Normal apontando pro jogador
+    glNormal3f(0, 0, 1); 
+    
+    // --- CÓDIGO CORRIGIDO (INVERTIDO U e V) ---
+    // Onde era 0.0 virou 1.0 e vice-versa, para desvirar e desespelhar.
+    glTexCoord2f(1.0f, 1.0f); glVertex3f(-hw, 0.0f, 0.0f); // Pé esquerdo (no mundo)
+    glTexCoord2f(0.0f, 1.0f); glVertex3f(hw, 0.0f, 0.0f);  // Pé direito
+    glTexCoord2f(0.0f, 0.0f); glVertex3f(hw, h, 0.0f);     // Cabeça direita
+    glTexCoord2f(1.0f, 0.0f); glVertex3f(-hw, h, 0.0f);    // Cabeça esquerda
+    // ------------------------------------------
+    glEnd();
+
+    glPopMatrix();
+
+    glDisable(GL_ALPHA_TEST);
+    glDisable(GL_BLEND);
+}
+
+// Essa é a função principal que vamos chamar no gameRender
+// Precisamos passar a lista de inimigos e itens
+void drawEntities(const std::vector<Enemy>& enemies, const std::vector<Item>& items, float camX, float camZ)
+{
+
+
+
+    glDisable(GL_LIGHTING);
+
+    // Desenha Itens
+    for (const auto& item : items)
+    {
+        if (!item.active) continue;
+
+        if (item.type == ITEM_HEALTH)
+            drawSprite(item.x, item.z, 0.7f, 0.7f, texHealth, camX, camZ);
+        else if (item.type == ITEM_AMMO)
+            drawSprite(item.x, item.z, 0.7f, 0.7f, texAmmo, camX, camZ); 
+    }
+
+    // Desenha Inimigos
+    for (const auto& en : enemies)
+    {
+        if (en.state == STATE_DEAD) continue;
+        
+        // 1. Define o padrão (Inimigo calmo)
+        GLuint currentTex = texEnemy; 
+
+        // 2. Se tomou dano (Prioridade Máxima)
+        if (en.hurtTimer > 0.0f) {
+            currentTex = texEnemyDamage;
+        }
+        // 3. Se está perseguindo ou atacando (Prioridade Média)
+        else if (en.state == STATE_CHASE || en.state == STATE_ATTACK) {
+            currentTex = texEnemyRage;
+        }
+
+
+        // 4. DESENHA USANDO A VARIÁVEL ESCOLHIDA (currentTex)
+        drawSprite(en.x, en.z, 4.5f, 4.5f, currentTex, camX, camZ);
+    }
+
+    glEnable(GL_LIGHTING);
 }

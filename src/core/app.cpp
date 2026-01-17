@@ -7,6 +7,8 @@
 #include <GL/glut.h>
 #include <GL/glu.h>
 
+extern void mouseClick(int button, int state, int x, int y);
+
 static const char *kTitle = "Um dia vai ser DOOM";
 
 static void displayCb()
@@ -47,6 +49,8 @@ void appInit()
     glutDisplayFunc(displayCb);
     glutReshapeFunc(reshapeCb);
     glutTimerFunc(0, timerCb, 0);
+
+glutMouseFunc(mouseClick); // <--- ADICIONE ISSO
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);

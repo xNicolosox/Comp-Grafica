@@ -19,6 +19,9 @@ static bool isWallTile(int tx, int tz)
         return false;
 
     char c = data[tz][tx];
+    // Adicione E, H, A como liberados
+    if (c == 'E' || c == 'H' || c == 'A') return false; 
+
     return (c == '1' || c == '2');
 }
 
