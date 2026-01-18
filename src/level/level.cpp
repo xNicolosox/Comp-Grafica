@@ -43,9 +43,18 @@ bool loadLevel(Level &lvl, const char *mapPath, float tileSize)
             float wx, wz;
             lvl.metrics.tileCenter(x, z, wx, wz);
 
-            if (c == 'E') // Inimigo
+            // --- ALTERAÇÃO AQUI: Lógica para múltiplos inimigos (E, F, G) ---
+            int enemyType = -1; // -1 significa "não é inimigo"
+
+            if (c == 'E') enemyType = 0;      // Inimigo Padrão
+            else if (c == 'F') enemyType = 1; // Inimigo Tipo 2 (Novo)
+            else if (c == 'G') enemyType = 2; // Inimigo Tipo 3 (Novo)
+
+            if (enemyType != -1) // Se achou qualquer um dos inimigos
             {
                 Enemy e;
+                e.type = enemyType; // <--- IMPORTANTE: Define qual a skin dele (0, 1 ou 2)
+
                 e.x = wx;
                 e.z = wz;
 
@@ -59,8 +68,12 @@ bool loadLevel(Level &lvl, const char *mapPath, float tileSize)
                 e.animFrame = 0;
                 e.animTimer = 0;
                 e.hurtTimer = 0.0f;
+                e.attackCooldown = 0.0f; // Garante que começa zerado
+
                 lvl.enemies.push_back(e);
             }
+            // ----------------------------------------------------------------
+
             else if (c == 'H') // Health Kit
             {
                 Item i;

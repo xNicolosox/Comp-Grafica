@@ -15,9 +15,13 @@ extern GLuint texSangue;
 extern GLuint texChao;
 extern GLuint texChaoInterno;
 extern GLuint texTeto;
-extern GLuint texEnemy;
-extern GLuint texEnemyRage;
-extern GLuint texEnemyDamage;
+
+// --- ALTERAÇÃO 1: Transformando em Arrays para suportar múltiplos inimigos ---
+extern GLuint texEnemies[3];       // Antes era texEnemy
+extern GLuint texEnemiesRage[3];   // Antes era texEnemyRage
+extern GLuint texEnemiesDamage[3]; // Antes era texEnemyDamage
+// -----------------------------------------------------------------------------
+
 extern GLuint texHealth;
 extern GLuint texAmmo;
 
@@ -306,7 +310,7 @@ void drawLevel(const MapLoader &map)
             char c = data[z][x];
 
             // Se for entidade, desenha o chão embaixo dela
-            if (c == 'E' || c == 'H' || c == 'A') {
+            if (c == 'E' || c == 'F' || c == 'G' || c == 'H' || c == 'A') {
                  desenhaTileChao(wx, wz, texChao, false);
                  // O inimigo/item em si será desenhado DEPOIS, em outra função
                  // que faremos na próxima etapa (Billboarding)
@@ -391,9 +395,6 @@ static void drawSprite(float x, float z, float w, float h, GLuint tex, float cam
 // Precisamos passar a lista de inimigos e itens
 void drawEntities(const std::vector<Enemy>& enemies, const std::vector<Item>& items, float camX, float camZ)
 {
-
-
-
     glDisable(GL_LIGHTING);
 
     // Desenha Itens
@@ -412,21 +413,33 @@ void drawEntities(const std::vector<Enemy>& enemies, const std::vector<Item>& it
     {
         if (en.state == STATE_DEAD) continue;
         
-        // 1. Define o padrão (Inimigo calmo)
-        GLuint currentTex = texEnemy; 
+        // --- ALTERAÇÃO 2: Escolhendo a textura correta para cada tipo ---
+        
+        // 1. Descobre qual inimigo é (0, 1 ou 2)
+        int t = en.type;
+        // Segurança: se vier lixo de memória, garante que é 0
+        if (t < 0) t = 0;
+        if (t > 2) t = 0;
 
-        // 2. Se tomou dano (Prioridade Máxima)
+        GLuint currentTex;
+
+        // 2. Lógica de Estado COM o tipo [t]
         if (en.hurtTimer > 0.0f) {
-            currentTex = texEnemyDamage;
+            // Se tomou dano, usa a textura de dano DO TIPO DELE
+            currentTex = texEnemiesDamage[t]; 
         }
-        // 3. Se está perseguindo ou atacando (Prioridade Média)
         else if (en.state == STATE_CHASE || en.state == STATE_ATTACK) {
-            currentTex = texEnemyRage;
+            // Se está perseguindo ou atacando, usa a textura de raiva DO TIPO DELE
+            currentTex = texEnemiesRage[t]; 
         }
-
+        else {
+            // Se está calmo, usa a textura normal DO TIPO DELE
+            currentTex = texEnemies[t]; 
+        }
+        // -----------------------------------------------------------------
 
         // 4. DESENHA USANDO A VARIÁVEL ESCOLHIDA (currentTex)
-        drawSprite(en.x, en.z, 4.5f, 4.5f, currentTex, camX, camZ);
+        drawSprite(en.x, en.z, 2.5f, 2.5f, currentTex, camX, camZ);
     }
 
     glEnable(GL_LIGHTING);

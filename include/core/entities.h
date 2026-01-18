@@ -12,6 +12,7 @@ enum EnemyState
 
 struct Enemy
 {
+    int type;
     float x, z;       // Posição no mundo
     float hp;         // Vida
     EnemyState state; // Estado atual (IA)

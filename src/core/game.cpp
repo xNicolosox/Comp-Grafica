@@ -23,9 +23,9 @@ GLuint texParedeInterna;
 GLuint texTeto;
 
 // Texturas de Entidades
-GLuint texEnemy;
-GLuint texEnemyRage;
-GLuint texEnemyDamage;
+GLuint texEnemies[3];
+GLuint texEnemiesRage[3];
+GLuint texEnemiesDamage[3];
 GLuint texHealth;
 GLuint texAmmo;
 GLuint texGunDefault, texGunFire1, texGunFire2;
@@ -152,8 +152,8 @@ void playerTryAttack()
         float dz = en.z - camZ;
         float dist = std::sqrt(dx*dx + dz*dz);
 
-        // Se estiver perto (alcance de 3 metros)
-        if (dist < 3.0f)
+        // Se estiver perto
+        if (dist < 17.0f)
         {
             // Calcula se estamos olhando para o inimigo
             float radYaw = yaw * 3.14159f / 180.0f;
@@ -168,14 +168,14 @@ void playerTryAttack()
             // Se o ângulo for bom (olhando pra frente)
             if (dot > 0.6f)
             {
-                en.hp -= 20; // Tira 20 de vida
+                en.hp -= 30; // Tira 20 de vida
                 en.hurtTimer = 0.5f; //Fica com cara de dor por 0.5s
                 std::printf("ACERTOU! HP Inimigo: %.0f\n", en.hp);
 
                 if (en.hp <= 0)
                 {
                     en.state = STATE_DEAD;
-                    en.respawnTimer = 60.0f; // <--- ADICIONE (60 segundos)
+                    en.respawnTimer = 60.0f; //60s
                 
                     std::printf("Inimigo MORREU! Respawn em 1min.\n");
                     Item drop;
@@ -388,9 +388,11 @@ bool gameInit(const char *mapPath)
     texGunReload2 = gAssets.texGunReload2;
 
     texDamage = gAssets.texDamage;
-    texEnemy = gAssets.texEnemy;
-    texEnemyRage = gAssets.texEnemyRage;
-    texEnemyDamage = gAssets.texEnemyDamage;
+    for(int i=0; i<3; i++) {
+        texEnemies[i]       = gAssets.texEnemies[i];
+        texEnemiesRage[i]   = gAssets.texEnemiesRage[i];
+        texEnemiesDamage[i] = gAssets.texEnemiesDamage[i];
+    }
     texHealthOverlay = gAssets.texHealthOverlay;
     texHealth = gAssets.texHealth;
     texAmmo = gAssets.texAmmo;
