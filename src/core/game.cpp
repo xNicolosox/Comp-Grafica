@@ -175,7 +175,7 @@ void playerTryAttack()
                 if (en.hp <= 0)
                 {
                     en.state = STATE_DEAD;
-                    en.respawnTimer = 60.0f; //60s
+                    en.respawnTimer = 15.0f; //60s
                 
                     std::printf("Inimigo MORREU! Respawn em 1min.\n");
                     Item drop;
@@ -241,7 +241,7 @@ void updateEntities(float dt)
                 en.hurtTimer = 0.0f;
                 std::printf("Inimigo RESPAWNOU!\n");
             }
-            continue; // <--- AGORA ESTÁ DENTRO DAS CHAVES (CORRETO)
+            continue; 
         }
 
         // Se o código chegou aqui, o inimigo está VIVO. Segue a lógica:
@@ -340,7 +340,7 @@ void updateEntities(float dt)
             item.active = false;
             
             if (item.type == ITEM_HEALTH) {
-                item.respawnTimer = 60.0f;
+                item.respawnTimer = 15.0f;
                 playerHealth += 50;
                 if(playerHealth > 100) playerHealth = 100;
                 healthAlpha = 1.0f; // Mostra o overlay de cura
