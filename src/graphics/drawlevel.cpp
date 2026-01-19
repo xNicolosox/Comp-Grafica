@@ -16,7 +16,7 @@ extern GLuint texChao;
 extern GLuint texChaoInterno;
 extern GLuint texTeto;
 
-// --- ALTERAÇÃO 1: Transformando em Arrays para suportar múltiplos inimigos ---
+// Transformando em Arrays para suportar múltiplos inimigos ---
 extern GLuint texEnemies[3];       // Antes era texEnemy
 extern GLuint texEnemiesRage[3];   // Antes era texEnemyRage
 extern GLuint texEnemiesDamage[3]; // Antes era texEnemyDamage
@@ -310,7 +310,7 @@ void drawLevel(const MapLoader &map)
             char c = data[z][x];
 
             // Se for entidade, desenha o chão embaixo dela
-            if (c == 'E' || c == 'F' || c == 'G' || c == 'H' || c == 'A') {
+            if (c == 'J' || c == 'T' || c == 'M' || c == 'K' || c == 'G' || c == 'H' || c == 'A') {
                  desenhaTileChao(wx, wz, texChao, false);
                  // O inimigo/item em si será desenhado DEPOIS, em outra função
                  // que faremos na próxima etapa (Billboarding)
