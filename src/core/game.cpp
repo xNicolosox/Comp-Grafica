@@ -349,7 +349,7 @@ void updateEntities(float dt)
             else if (item.type == ITEM_AMMO) {
                 // Caixa de munição não precisa de respawnTimer aqui se não quiser,
                 // ou pode colocar também item.respawnTimer = 60.0f;
-                item.respawnTimer = 999999.0f; // <--- ADICIONE ISSO
+                item.respawnTimer = 999999.0f; // Nunca respawna
                 reserveAmmo = 20;
                 std::printf("PEGOU MUNICAO!\n");
             }
