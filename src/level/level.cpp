@@ -46,9 +46,11 @@ bool loadLevel(Level &lvl, const char *mapPath, float tileSize)
             // --- ALTERAÇÃO AQUI: Lógica para múltiplos inimigos (E, F, G) ---
             int enemyType = -1; // -1 significa "não é inimigo"
 
-            if (c == 'J') enemyType = 0;      // Inimigo Padrão
-            else if (c == 'T') enemyType = 1; // Inimigo Tipo 2 (Novo)
-            else if (c == 'M') enemyType = 2; // Inimigo Tipo 3 (Novo)
+            if (c == 'J') enemyType = 0;      // Inimigo Tipo 1
+            else if (c == 'T') enemyType = 1; // Inimigo Tipo 2 
+            else if (c == 'M') enemyType = 2; // Inimigo Tipo 3 
+            else if (c == 'G') enemyType = 3; // Inimigo Tipo 4
+            else if (c == 'K') enemyType = 4; // Inimigo Tipo 5
 
             if (enemyType != -1) // Se achou qualquer um dos inimigos
             {

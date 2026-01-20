@@ -23,9 +23,9 @@ GLuint texParedeInterna;
 GLuint texTeto;
 
 // Texturas de Entidades
-GLuint texEnemies[3];
-GLuint texEnemiesRage[3];
-GLuint texEnemiesDamage[3];
+GLuint texEnemies[5];
+GLuint texEnemiesRage[5];
+GLuint texEnemiesDamage[5];
 GLuint texHealth;
 GLuint texAmmo;
 GLuint texGunDefault, texGunFire1, texGunFire2;
@@ -175,7 +175,7 @@ void playerTryAttack()
                 if (en.hp <= 0)
                 {
                     en.state = STATE_DEAD;
-                    en.respawnTimer = 15.0f; //60s
+                    en.respawnTimer = 15.0f;
                 
                     std::printf("Inimigo MORREU! Respawn em 1min.\n");
                     Item drop;
@@ -388,7 +388,7 @@ bool gameInit(const char *mapPath)
     texGunReload2 = gAssets.texGunReload2;
 
     texDamage = gAssets.texDamage;
-    for(int i=0; i<3; i++) {
+    for(int i=0; i<5; i++) {
         texEnemies[i]       = gAssets.texEnemies[i];
         texEnemiesRage[i]   = gAssets.texEnemiesRage[i];
         texEnemiesDamage[i] = gAssets.texEnemiesDamage[i];

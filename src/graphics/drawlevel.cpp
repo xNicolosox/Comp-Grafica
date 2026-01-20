@@ -17,9 +17,9 @@ extern GLuint texChaoInterno;
 extern GLuint texTeto;
 
 // Transformando em Arrays para suportar múltiplos inimigos ---
-extern GLuint texEnemies[3];       // Antes era texEnemy
-extern GLuint texEnemiesRage[3];   // Antes era texEnemyRage
-extern GLuint texEnemiesDamage[3]; // Antes era texEnemyDamage
+extern GLuint texEnemies[5];       // Antes era texEnemy
+extern GLuint texEnemiesRage[5];   // Antes era texEnemyRage
+extern GLuint texEnemiesDamage[5]; // Antes era texEnemyDamage
 // -----------------------------------------------------------------------------
 
 extern GLuint texHealth;
@@ -419,7 +419,7 @@ void drawEntities(const std::vector<Enemy>& enemies, const std::vector<Item>& it
         int t = en.type;
         // Segurança: se vier lixo de memória, garante que é 0
         if (t < 0) t = 0;
-        if (t > 2) t = 0;
+        if (t > 4) t = 0;
 
         GLuint currentTex;
 

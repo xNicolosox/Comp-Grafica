@@ -24,9 +24,9 @@ struct GameAssets
     GLuint texGunReload2 = 0;
     GLuint texDamage = 0;
 
-    GLuint texEnemies[3]       = {0, 0, 0};
-    GLuint texEnemiesRage[3]   = {0, 0, 0};
-    GLuint texEnemiesDamage[3] = {0, 0, 0};
+    GLuint texEnemies[5]       = {0, 0, 0, 0, 0};
+    GLuint texEnemiesRage[5]   = {0, 0, 0, 0, 0};
+    GLuint texEnemiesDamage[5] = {0, 0, 0, 0, 0};
 
     // shaders
     GLuint progSangue = 0;

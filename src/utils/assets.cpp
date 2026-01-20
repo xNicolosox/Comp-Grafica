@@ -16,25 +16,29 @@ bool loadAssets(GameAssets &a)
     a.progSangue = criaShader("shaders/blood.vert", "shaders/blood.frag");
     a.progLava = criaShader("shaders/lava.vert", "shaders/lava.frag");
 
-    // --- INIMIGO 0 ('E') ---
+    // --- INIMIGO 0 ('J') ---
     a.texEnemies[0]       = carregaTextura("assets/enemies/enemy.png");
     a.texEnemiesRage[0]   = carregaTextura("assets/enemies/enemyRage.png");
     a.texEnemiesDamage[0] = carregaTextura("assets/enemies/enemyRageDamage.png");
 
-    // --- INIMIGO 1 ('F') ---
+    // --- INIMIGO 1 ('T') ---
     a.texEnemies[1]       = carregaTextura("assets/enemies/enemy2.png");
     a.texEnemiesRage[1]   = carregaTextura("assets/enemies/enemyRage2.png");
     a.texEnemiesDamage[1] = carregaTextura("assets/enemies/enemyRageDamage2.png");
 
-    // --- INIMIGO 2 ('G') ---
+    // --- INIMIGO 2 ('M') ---
     a.texEnemies[2]       = carregaTextura("assets/enemies/enemy3.png");
     a.texEnemiesRage[2]   = carregaTextura("assets/enemies/enemyRage3.png");
     a.texEnemiesDamage[2] = carregaTextura("assets/enemies/enemyRageDamage3.png");
 
-    // --- INIMIGO 3 ('G') ---
-
+    // --- INIMIGO 3 ('K') ---
+    a.texEnemies[3]       = carregaTextura("assets/enemies/enemy4.png");
+    a.texEnemiesRage[3]   = carregaTextura("assets/enemies/enemyRage4.png");
+    a.texEnemiesDamage[3] = carregaTextura("assets/enemies/enemyRageDamage4.png");
     // --- INIMIGO 4 ('G') ---
-
+    a.texEnemies[4]       = carregaTextura("assets/enemies/enemy5.png");
+    a.texEnemiesRage[4]   = carregaTextura("assets/enemies/enemyRage5.png");
+    a.texEnemiesDamage[4] = carregaTextura("assets/enemies/enemyRageDamage5.png");
 
     a.texHealthOverlay = carregaTextura("assets/heal.png");
     a.texGunDefault  = carregaTextura("assets/gun_default.png");
