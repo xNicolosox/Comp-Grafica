@@ -2,16 +2,19 @@
 #include "utils/assets.h"
 #include "level/level.h"
 #include "core/config.h"
+#include "graphics/skybox.h"
 
 #include "core/camera.h"
 #include "input/input.h"
 #include "graphics/drawlevel.h"
 #include "core/movement.h"
-#include "core/entities.h" // Importante incluir
+#include "core/entities.h" 
+
 #include <GL/glut.h>
 #include "core/window.h"
 #include <cmath>
 #include <cstdio>
+#include <string>
 
 // --- VARIÁVEIS GLOBAIS ---
 GLuint texChao;
@@ -21,6 +24,7 @@ GLuint texLava;
 GLuint texChaoInterno;
 GLuint texParedeInterna;
 GLuint texTeto;
+GLuint texSkydome;
 
 // Texturas de Entidades
 GLuint texEnemies[5];
@@ -168,7 +172,7 @@ void playerTryAttack()
             // Se o ângulo for bom (olhando pra frente)
             if (dot > 0.6f)
             {
-                en.hp -= 30; // Tira 20 de vida
+                en.hp -= 30; // Tira 30 de vida
                 en.hurtTimer = 0.5f; //Fica com cara de dor por 0.5s
                 std::printf("ACERTOU! HP Inimigo: %.0f\n", en.hp);
 
@@ -326,7 +330,7 @@ void updateEntities(float dt)
                 item.active = true;
                 std::printf("Item de volta no mapa!\n");
             }
-            continue; // <--- AGORA ESTÁ DENTRO DAS CHAVES (CORRETO)
+            continue; 
         }
 
         // Se chegou aqui, o item está ATIVO. Verifica colisão:
@@ -379,6 +383,9 @@ bool gameInit(const char *mapPath)
     texChaoInterno = gAssets.texChaoInterno;
     texParedeInterna = gAssets.texParedeInterna;
     texTeto = gAssets.texTeto;
+    
+    // --- CONECTA O SKYDOME ---
+    texSkydome = gAssets.texSkydome;
 
 
     texGunDefault  = gAssets.texGunDefault;
@@ -486,8 +493,6 @@ void gameUpdate(float dt)
         damageAlpha -= dt * 0.5f; // Demora uns 2 segundos pra sumir totalmente
         if (damageAlpha < 0.0f) damageAlpha = 0.0f;
     }
-
-
 
     if (healthAlpha > 0.0f) {
         healthAlpha -= dt * 0.9f; // Ajuste 0.9f se quiser mais rápido/devagar
@@ -660,7 +665,7 @@ void drawWeaponHUD()
     }
 
     // 5. Desenha o quadrado da arma
-  glBegin(GL_QUADS);
+    glBegin(GL_QUADS);
         // Note que o segundo número (V) foi invertido: de 0.0 virou 1.0 e vice-versa.
         glTexCoord2f(0.0f, 1.0f); glVertex2f(x, y);            // Baixo Esq da tela = Topo da imagem
         glTexCoord2f(1.0f, 1.0f); glVertex2f(x + gunW, y);     // Baixo Dir da tela = Topo da imagem
@@ -784,6 +789,9 @@ void gameRender()
         0.0f, 1.0f, 0.0f);
 
     setSunDirectionEachFrame();
+
+    // --- DESENHAR O CÉU ANTES DO MAPA ---
+    drawSkydome(camX, camY, camZ);
 
     drawLevel(gLevel.map);
     
